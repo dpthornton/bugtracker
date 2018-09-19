@@ -22,8 +22,7 @@ class IssuesModel {
     return response
   }
   async updateIssue(issueId, fields) {
-	  
-    console.log(fields)
+	 
     await m.request({
       method: "PUT",
       url: `/issues/${issueId}`,

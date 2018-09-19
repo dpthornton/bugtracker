@@ -8,7 +8,7 @@ const issuesModel = new IssuesModel()
 m.route(document.body, '/issues', {
   '/issues': {
     render(vnode) {
-    	return m(ToolbarContainer, m(IssuesList, {model: issuesModel}))
+      return m(ToolbarContainer, m(IssuesList, {model: issuesModel}))
     }
 
   },

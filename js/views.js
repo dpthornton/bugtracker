@@ -1,6 +1,15 @@
 const m = require('mithril')
 var moment = require('moment');
 
+function convert_date(date_string) {
+
+	new_date = moment(date_string).utcOffset('+0100').format('YYYY-MM-DD HH:mm:ss');
+	if (new_date == 'Invalid date') {
+		new_date = '';
+	}
+	return new_date
+}
+
 class IssuesList {
   constructor(vnode) {
     this.model = vnode.attrs.model
@@ -19,8 +28,8 @@ class IssuesList {
         this.model.list.map(item =>
           m('tr', [
             m('td.title-cell', m("a", {href: `/issues/${item.id}`, oncreate: m.route.link}, item.title)),
-            m('td.opened-cell', item.opened),
-            m('td.closed-cell', item.closed)
+            m('td.opened-cell', convert_date(item.opened) ),
+            m('td.closed-cell', convert_date(item.closed) )
           ])
         )
       ])
@@ -59,9 +68,9 @@ class ViewIssue {
         ]),
         m('dl.row', [
           m('dt.col-sm-3', 'Opened'),
-          m('dd.col-sm-3', moment(detail.opened).utcOffset('+0100').format('YYYY-MM-DD HH:mm:ss') ),
+          m('dd.col-sm-3',  convert_date(detail.opened)  ),
           m('dt.col-sm-3', 'Closed'),
-          m('dd.col-sm-3', moment(detail.closed).utcOffset('+0100').format('YYYY-MM-DD HH:mm:ss') ),
+          m('dd.col-sm-3', convert_date(detail.closed) ),
         ]),
         m('h2', 'Description'),
         m('p.description', detail.description)
@@ -195,5 +204,7 @@ const ToolbarContainer = {
     ])
   }
 }
+
+
 
 module.exports = {IssuesList, ViewIssue, EditIssue, CreateIssue, IssueEditor, CloseIssue, CloseCheck, ToolbarContainer}

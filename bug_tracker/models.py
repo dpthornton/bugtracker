@@ -3,8 +3,6 @@ import dateutil.parser
 import datetime
 import sqlite3
 from collections import namedtuple
-from passlib.hash import sha256_crypt
-from bugtracker import utils
 
 from .migrate_database import do_migrations
 
@@ -75,6 +73,7 @@ class IssueRepository(object):
             cursor.close()
 
     def fetch_issue(self, issue_id):
+        print(issue_id)
         cursor = self._conn.cursor()
         try:
             cursor.execute(
@@ -85,7 +84,7 @@ class IssueRepository(object):
                     opened_datetime,
                     closed_datetime
                     FROM issues
-                    WHERE id = ()""", issue_id)
+                    WHERE id = ?""",(issue_id,))
             return make_issue(cursor.fetchone())
         finally:
             cursor.close()
@@ -111,20 +110,17 @@ class IssueRepository(object):
             if 'title' in kwargs:
                 cursor.execute(
                     "UPDATE issues SET title = ? WHERE id = ?",
-                    kwargs['title'], 
-                    issue_id
+                    (kwargs['title'], issue_id)
                 )
             if 'description' in kwargs:
                 cursor.execute(
                     "UPDATE issues SET description = ? WHERE id = ?",
-                    kwargs['description'], 
-                    issue_id)
+                    (kwargs['description'], issue_id)
                 )
             if 'closed' in kwargs:
-                cursor.execute(
-                    "UPDATE issues SET closed_datetime = ? WHERE id = ?",
-                    kwargs['closed'].isoformat(), 
-                    issue_id
+                self.cur_execute(
+                    "UPDATE issues SET closed_datetime = ? WHERE id = ?", 
+                    (datetime.datetime.now(), issue_id)
                 )
         finally:
             cursor.close()

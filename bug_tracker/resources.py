@@ -25,6 +25,7 @@ class IssuesResource(object):
             resp.status = falcon.HTTP_200
 
     def on_post(self, req, resp):
+    
         with self._repo.open() as repo:
             new_issue = req.media
             new_id = repo.issues.create_issue(
@@ -32,15 +33,19 @@ class IssuesResource(object):
                 new_issue['description']
             )
         raise falcon.HTTPSeeOther('/issues/{}'.format(new_id))
-
-
+    
 class IssueResource(object):
     def __init__(self, repo):
         self._repo = repo
 
     def on_get(self, req, resp, issue_id):
         with self._repo.open() as repo:
-            issue = repo.issues.fetch_issue(int(issue_id))
+            try:
+                issue = repo.issues.fetch_issue(int(issue_id))
+            except (TypeError, ValueError) as e:
+                raise falcon.HTTPBadRequest( 'The issue Id was not found, please enter a valid issue Id.',
+                                        'A valid Issue Id is required.')
+
             resp.media = _issue_to_json(issue)
             resp.status = falcon.HTTP_200
 
