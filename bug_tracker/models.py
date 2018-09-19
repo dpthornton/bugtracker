@@ -1,7 +1,10 @@
 from __future__ import absolute_import
 import dateutil.parser
+import datetime
 import sqlite3
 from collections import namedtuple
+from passlib.hash import sha256_crypt
+from bugtracker import utils
 
 from .migrate_database import do_migrations
 
@@ -82,20 +85,22 @@ class IssueRepository(object):
                     opened_datetime,
                     closed_datetime
                     FROM issues
-                    WHERE id = {}""".format(issue_id))
+                    WHERE id = ()""", issue_id)
             return make_issue(cursor.fetchone())
         finally:
             cursor.close()
 
+    def cur_execute(self, data, args=()):
+        con = self._conn
+        with con:
+            cur = con.cursor()
+            cur.execute(data, args)
+        
     def create_issue(self, title, description):
         cursor = self._conn.cursor()
         try:
-            cursor.execute(
-                """INSERT INTO issues(
-                    title,
-                    description
-                ) VALUES('{}', '{}')""".format(title, description))
-            cursor.execute("select last_insert_rowid()")
+            self.cur_execute("INSERT INTO issues(title, description) VALUES(?, ?)", (title, description))
+            cursor.execute("SELECT last_insert_rowid()")
             return cursor.fetchone()[0]
         finally:
             cursor.close()
@@ -105,18 +110,21 @@ class IssueRepository(object):
         try:
             if 'title' in kwargs:
                 cursor.execute(
-                    """UPDATE issues SET title = '{}' WHERE id = {}"""
-                    .format(kwargs['title'], issue_id)
+                    "UPDATE issues SET title = ? WHERE id = ?",
+                    kwargs['title'], 
+                    issue_id
                 )
             if 'description' in kwargs:
                 cursor.execute(
-                    """UPDATE issues SET description = '{}' WHERE id = {}"""
-                    .format(kwargs['description'], issue_id)
+                    "UPDATE issues SET description = ? WHERE id = ?",
+                    kwargs['description'], 
+                    issue_id)
                 )
             if 'closed' in kwargs:
                 cursor.execute(
-                    """UPDATE issues SET closed_datetime = '{}' WHERE id = {}"""
-                    .format(kwargs['closed'].isoformat(), issue_id)
+                    "UPDATE issues SET closed_datetime = ? WHERE id = ?",
+                    kwargs['closed'].isoformat(), 
+                    issue_id
                 )
         finally:
             cursor.close()
