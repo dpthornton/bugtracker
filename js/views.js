@@ -2,12 +2,11 @@ const m = require('mithril')
 var moment = require('moment');
 
 function convert_date(date_string) {
-
-	new_date = moment(date_string).utcOffset('+0100').format('YYYY-MM-DD HH:mm:ss');
-	if (new_date == 'Invalid date') {
-		new_date = '';
-	}
-	return new_date
+  new_date = moment(date_string).utcOffset('+0100').format('YYYY-MM-DD HH:mm:ss');
+  if (new_date == 'Invalid date') {
+    new_date = '';
+  }
+  return new_date
 }
 
 class IssuesList {
