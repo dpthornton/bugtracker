@@ -17,10 +17,13 @@ class IssuesModel {
   }
   async loadIssue(issueId) {
     let response = await m.request(`/issues/${issueId}`)
+
     this.issues[issueId] = response
     return response
   }
   async updateIssue(issueId, fields) {
+	  
+    console.log(fields)
     await m.request({
       method: "PUT",
       url: `/issues/${issueId}`,
