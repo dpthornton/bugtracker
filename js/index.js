@@ -10,7 +10,6 @@ m.route(document.body, '/issues', {
     render(vnode) {
       return m(ToolbarContainer, m(IssuesList, {model: issuesModel}))
     }
-
   },
   '/issues/create': {
     render(vnode) {
