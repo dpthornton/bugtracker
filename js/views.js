@@ -27,8 +27,8 @@ class IssuesList {
         this.model.list.map(item =>
           m('tr', [
             m('td.title-cell', m("a", {href: `/issues/${item.id}`, oncreate: m.route.link}, item.title)),
-            m('td.opened-cell', convert_date(item.opened) ),
-            m('td.closed-cell', convert_date(item.closed) )
+            m('td.opened-cell', convert_date(item.opened)),
+            m('td.closed-cell', convert_date(item.closed))
           ])
         )
       ])
@@ -67,9 +67,9 @@ class ViewIssue {
         ]),
         m('dl.row', [
           m('dt.col-sm-3', 'Opened'),
-          m('dd.col-sm-3',  convert_date(detail.opened)  ),
+          m('dd.col-sm-3', convert_date(detail.opened)),
           m('dt.col-sm-3', 'Closed'),
-          m('dd.col-sm-3', convert_date(detail.closed) ),
+          m('dd.col-sm-3', convert_date(detail.closed)),
         ]),
         m('h2', 'Description'),
         m('p.description', detail.description)
@@ -104,28 +104,28 @@ class EditIssue {
 }
 
 class CloseIssue {
-	  constructor(vnode) {
-	    this.model = vnode.attrs.model
-	    this.issueId = vnode.attrs.issueId
-	  }
-	  async oninit() {
-	    await this.model.loadIssue(this.issueId)
-	  }
-	  view() {
-	    let issue = this.model.issues[this.issueId]
-	    return issue
-	    ? m(CloseCheck, {
-	      title: issue.title,
-	      description: issue.description,
-	      onSubmit: async (fields) => {
-	        await this.model.updateIssue(this.issueId, fields)
-	        m.route.set(`/issues/${this.issueId}`)
-	        m.redraw()
-	      }
-	    })
-	    :m('.alert.alert-info', 'Loading')
-	  }
-	}
+  constructor(vnode) {
+    this.model = vnode.attrs.model 
+    this.issueId = vnode.attrs.issueId
+  }
+  async oninit() {
+    await this.model.loadIssue(this.issueId)
+  }
+  view() {
+    let issue = this.model.issues[this.issueId]
+    return issue
+    ? m(CloseCheck, {
+      title: issue.title,
+      description: issue.description,
+      onSubmit: async (fields) => {
+        await this.model.updateIssue(this.issueId, fields)
+        m.route.set(`/issues/${this.issueId}`)
+        m.redraw()
+      }
+    })
+    :m('.alert.alert-info', 'Loading')
+  }
+}
 
 class CreateIssue {
   constructor(vnode) {
@@ -145,25 +145,25 @@ class CreateIssue {
 }
 
 class IssueEditor {
-	  constructor(vnode) {
-	    this.title = vnode.attrs.title
-	    this.description = vnode.attrs.description
-	    this.onSubmit = vnode.attrs.onSubmit
-	  }
-	  view() {
-	    return m('form', {onsubmit: e => this.onSubmit({title: this.title, description: this.description})}, [
-	      m('.form-group', [
-	        m('label', {'for': 'title-input'}, 'Issue Title'),
-	        m('input.form-control#title-input', {value: this.title, oninput: (e) => {this.title = e.target.value}})
-	      ]),
-	      m('.form-group', [
-	        m('label', {'for': 'description-input'}, 'Description'),
-	        m('textarea.form-control#description-input', {value: this.description, oninput: (e) => {this.description = e.target.value}})
-	      ]),
-	      m('button.btn.btn-primary#save-button', {type: 'submit'}, 'Save')
-	    ])
-	  }
-	}
+  constructor(vnode) {
+    this.title = vnode.attrs.title
+    this.description = vnode.attrs.description
+    this.onSubmit = vnode.attrs.onSubmit
+  }
+  view() {
+    return m('form', {onsubmit: e => this.onSubmit({title: this.title, description: this.description})}, [
+      m('.form-group', [
+        m('label', {'for': 'title-input'}, 'Issue Title'),
+         m('input.form-control#title-input', {value: this.title, oninput: (e) => {this.title = e.target.value}})
+      ]),
+      m('.form-group', [
+        m('label', {'for': 'description-input'}, 'Description'),
+        m('textarea.form-control#description-input', {value: this.description, oninput: (e) => {this.description = e.target.value}})
+      ]),
+      m('button.btn.btn-primary#save-button', {type: 'submit'}, 'Save')
+    ]) 
+  }
+}
 
 class CloseCheck {
   constructor(vnode) {
@@ -203,7 +203,5 @@ const ToolbarContainer = {
     ])
   }
 }
-
-
 
 module.exports = {IssuesList, ViewIssue, EditIssue, CreateIssue, IssueEditor, CloseIssue, CloseCheck, ToolbarContainer}
