@@ -1,4 +1,5 @@
 const m = require('mithril')
+var moment = require('moment');
 
 class IssuesList {
   constructor(vnode) {
@@ -40,12 +41,19 @@ class ViewIssue {
     return detail
     ? m('div',[
         m('.row', [
-          m('h1.col-sm-11', detail.title),
+          m('h1.col-sm-10', detail.title),
           m('.col-sm-1',
             m(
               'a.btn.btn-primary',
               {href: `/issues/${this.issueId}/edit`, oncreate: m.route.link},
               'Edit'
+            )
+          ),
+          m('.col-sm-1',  
+            m(
+              'a.btn.btn-secondary',
+              {href: `/issues/${this.issueId}/close`, oncreate: m.route.link},
+              'Close Issue'
             )
           )
         ]),
@@ -87,6 +95,30 @@ class EditIssue {
   }
 }
 
+class CloseIssue {
+	  constructor(vnode) {
+	    this.model = vnode.attrs.model
+	    this.issueId = vnode.attrs.issueId
+	  }
+	  async oninit() {
+	    await this.model.loadIssue(this.issueId)
+	  }
+	  view() {
+	    let issue = this.model.issues[this.issueId]
+	    return issue
+	    ? m(CloseCheck, {
+	      title: issue.title,
+	      description: issue.description,
+	      onSubmit: async (fields) => {
+	        await this.model.updateIssue(this.issueId, fields)
+	        m.route.set(`/issues/${this.issueId}`)
+	        m.redraw()
+	      }
+	    })
+	    :m('.alert.alert-info', 'Loading')
+	  }
+	}
+
 class CreateIssue {
   constructor(vnode) {
     this.model = vnode.attrs.model
@@ -105,22 +137,43 @@ class CreateIssue {
 }
 
 class IssueEditor {
+	  constructor(vnode) {
+	    this.title = vnode.attrs.title
+	    this.description = vnode.attrs.description
+	    this.onSubmit = vnode.attrs.onSubmit
+	  }
+	  view() {
+	    return m('form', {onsubmit: e => this.onSubmit({title: this.title, description: this.description})}, [
+	      m('.form-group', [
+	        m('label', {'for': 'title-input'}, 'Issue Title'),
+	        m('input.form-control#title-input', {value: this.title, oninput: (e) => {this.title = e.target.value}})
+	      ]),
+	      m('.form-group', [
+	        m('label', {'for': 'description-input'}, 'Description'),
+	        m('textarea.form-control#description-input', {value: this.description, oninput: (e) => {this.description = e.target.value}})
+	      ]),
+	      m('button.btn.btn-primary#save-button', {type: 'submit'}, 'Save')
+	    ])
+	  }
+	}
+
+class CloseCheck {
   constructor(vnode) {
     this.title = vnode.attrs.title
-    this.descriptionText = vnode.attrs.descriptionText
+    this.description = vnode.attrs.description
     this.onSubmit = vnode.attrs.onSubmit
   }
   view() {
-    return m('form', {onsubmit: e => this.onSubmit({title: this.title, descriptionText: this.descriptionText})}, [
+    return m('form', {onsubmit: e => this.onSubmit({closed: 'closed'})}, [
       m('.form-group', [
         m('label', {'for': 'title-input'}, 'Issue Title'),
-        m('input.form-control#title-input', {value: this.title, oninput: (e) => {this.title = e.target.value}})
+        m('input.form-control#title-input', {readonly: true, value: this.title, oninput: (e) => {this.title = e.target.value}})
       ]),
       m('.form-group', [
         m('label', {'for': 'description-input'}, 'Description'),
-        m('textarea.form-control#description-input', {oninput: (e) => {this.descriptionText = e.target.value}}, this.descriptionText)
+        m('textarea.form-control#description-input', {readonly: true, value: this.description, oninput: (e) => {this.description = e.target.value}})
       ]),
-      m('button.btn.btn-primary#save-button', {type: 'submit'}, 'Save')
+      m('button.btn.btn-warning#closed', {type: 'submit', style: 'margin: 0.3em'}, 'Close Issue')
     ])
   }
 }
@@ -143,4 +196,6 @@ const ToolbarContainer = {
   }
 }
 
-module.exports = {IssuesList, ViewIssue, EditIssue, CreateIssue, IssueEditor, ToolbarContainer}
+
+
+module.exports = {IssuesList, ViewIssue, EditIssue, CreateIssue, IssueEditor, CloseIssue, CloseCheck, ToolbarContainer}
