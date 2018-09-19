@@ -1,5 +1,14 @@
-Python Tech Test
-================
+Technical Test
+==============
+
+I fixed the first bug mentioned in all the SQL queries, as it was a SQL injection vulnerability and thought I may as well make the other changes. 
+
+I chose to have a separate 'Close' issue button, even though it's effectively an issue 'edit' when closing an issue. I thought that in a system like this, the close would probably be semi-permanent to the user, so you'd want to quickly make sure the user was happy closing off the issue! 
+
+The timezone fix I attempted to do client-side, just in case the client location is different from the server.  
+
+The error handling I only partially completed as it wasn't clear to me what the requirements were entirely.
+
 
 Goal
 ----
